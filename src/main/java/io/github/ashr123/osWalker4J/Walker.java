@@ -24,6 +24,7 @@ public class Walker
 							(file.isDirectory() ? walkResult.dirs() : walkResult.files()).add(file);
 							return walkResult;
 						},
+						// not in use anyway in sequential stream
 						(walkResult1, walkResult2) -> new WalkResult(
 								top,
 								Stream.concat(
@@ -34,7 +35,7 @@ public class Walker
 										walkResult1.files().stream(),
 										walkResult2.files().stream()
 								).toList()
-						) // not in use anyway in sequential stream
+						)
 				);
 	}
 
@@ -43,9 +44,7 @@ public class Walker
 		return Stream.concat(
 				Stream.of(top),
 				top.dirs().stream()
-						.map(directory -> prepareWalkResult(top.root().resolve(Path.of(directory.getName()))))
-						.flatMap(Walker::walk)
-		);
+						.flatMap(directory -> walk(prepareWalkResult(top.root().resolve(directory.toPath().getFileName())))));
 	}
 
 	public static Stream<WalkResult> walk(Path top)
@@ -62,11 +61,16 @@ public class Walker
 		@Override
 		public String toString()
 		{
-			return "WalkResult[" +
-					"root=" + root +
-					", dirs=" + dirs.stream().map(File::getName).toList() +
-					", files=" + files.stream().map(File::getName).toList() +
-					']';
+//			return "WalkResult[" +
+//					"root=" + root +
+//					", dirs=" + dirs.stream().map(File::getName).toList() +
+//					", files=" + files.stream().map(File::getName).toList() +
+//					']';
+			return "(" +
+					root + ", " +
+					dirs.stream().map(File::getName).toList() + ", " +
+					files.stream().map(File::getName).toList() +
+					")";
 		}
 	}
 }
